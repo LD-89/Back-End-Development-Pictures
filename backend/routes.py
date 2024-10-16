@@ -35,7 +35,7 @@ def count():
 ######################################################################
 @app.route("/picture", methods=["GET"])
 def get_pictures():
-    pass
+    return jsonify(data)
 
 ######################################################################
 # GET A PICTURE
@@ -44,7 +44,10 @@ def get_pictures():
 
 @app.route("/picture/<int:id>", methods=["GET"])
 def get_picture_by_id(id):
-    pass
+    for picture in data:
+        if picture['id'] == id:
+            return jsonify(picture)
+    return make_response("Picture Not Found", 404)
 
 
 ######################################################################
@@ -52,7 +55,12 @@ def get_picture_by_id(id):
 ######################################################################
 @app.route("/picture", methods=["POST"])
 def create_picture():
-    pass
+    new_picture = request.json
+    for picture in data:
+        if picture['id'] == new_picture['id']:
+            return make_response({"Message": f"picture with id {picture['id']} already present"}, 302)
+    data.append(new_picture)
+    return make_response(jsonify(new_picture), 201)
 
 ######################################################################
 # UPDATE A PICTURE
@@ -61,11 +69,21 @@ def create_picture():
 
 @app.route("/picture/<int:id>", methods=["PUT"])
 def update_picture(id):
-    pass
+    new_picture = request.json
+    for i in range(len(data)):
+        if data[i]['id'] == new_picture['id']:
+            data[i] = new_picture
+            return jsonify(new_picture)
+    return make_response({"message": "picture not found"}, 404)
+            
 
 ######################################################################
 # DELETE A PICTURE
 ######################################################################
 @app.route("/picture/<int:id>", methods=["DELETE"])
 def delete_picture(id):
-    pass
+    for i in range(len(data)):
+        if data[i]['id'] == id:
+            del data[i]
+            return make_response({}, 204)
+    return make_response({"message": "picture not found"}, 404)
